@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Star_Edition</title>
+    <title>Neon Starstrike</title>
     <style>
         body {
             margin: 0;
@@ -12,207 +12,207 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background: linear-gradient(000deg, #ff6f61, #6b48ff, #00ddeb);
-            background-size: 200% 200%;
-            animation: backgroundShift 15s ease infinite;
-            font-family: 'Arial', sans-serif;
+            background: #0d0d1a;
+            font-family: 'Orbitron', sans-serif;
             overflow: hidden;
         }
-        @keyframes backgroundShift {
-            0% { background-position: 0% 0%; }
-            50% { background-position: 100% 100%; }
-            100% { background-position: 0% 0%; }
+        .cyber-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #1a1a3d 0%, #0d0d1a 70%);
+            animation: neonFlicker 10s infinite;
+            z-index: -1;
+        }
+        @keyframes neonFlicker {
+            0%, 100% { opacity: 0.9; }
+            50% { opacity: 1; }
         }
         #game-container {
             position: relative;
-            width: 800px;
-            height: 700px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 20px;
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.7);
+            width: 900px;
+            height: 750px;
+            background: rgba(20, 20, 40, 0.85);
+            border-radius: 15px;
+            box-shadow: 0 0 60px rgba(0, 255, 255, 0.5), inset 0 0 20px rgba(255, 0, 255, 0.3);
             overflow: hidden;
-            border: 5px solid #ffd700;
-            animation: borderPulse 3s infinite;
+            border: 4px solid #00ffcc;
+            animation: cyberBorder 4s infinite;
         }
-        @keyframes borderPulse {
-            0% { border-color: #ffd700; }
+        @keyframes cyberBorder {
+            0% { border-color: #00ffcc; }
             33% { border-color: #ff00ff; }
-            66% { border-color: #00ffff; }
-            100% { border-color: #ffd700; }
+            66% { border-color: #ffff00; }
+            100% { border-color: #00ffcc; }
         }
-        #score, #level, #high-score {
+        #score, #level, #high-score, #lives {
             position: absolute;
-            top: 20px;
-            font-size: 24px;
-            color: #fff;
-            text-shadow: 2px 2px 5px #000;
-            animation: textBounce 2s infinite;
+            top: 15px;
+            font-size: 22px;
+            color: #00ffcc;
+            text-shadow: 0 0 10px #00ffcc;
+            z-index: 10;
         }
         #score { left: 20px; }
         #level { left: 50%; transform: translateX(-50%); }
         #high-score { right: 20px; }
-        @keyframes textBounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
+        #lives { left: 150px; }
         #title {
             position: absolute;
-            top: 60px;
+            top: 50px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 48px;
-            color: #ffd700;
-            text-shadow: 4px 4px 8px #ff00ff, -4px -4px 8px #00ffff;
-            animation: titleGlow 2s infinite;
+            font-size: 60px;
+            color: #ff00ff;
+            text-shadow: 0 0 15px #ff00ff, 0 0 30px #00ffcc;
+            animation: neonPulse 1.5s infinite;
         }
-        @keyframes titleGlow {
-            0% { text-shadow: 4px 4px 8px #ff00ff, -4px -4px 8px #00ffff; }
-            50% { text-shadow: 6px 6px 12px #ff00ff, -6px -6px 12px #00ffff; }
-            100% { text-shadow: 4px 4px 8px #ff00ff, -4px -4px 8px #00ffff; }
+        @keyframes neonPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
         #player {
             position: absolute;
-            bottom: 20px;
-            width: 50px;
-            height: 50px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="cyan"><circle cx="12" cy="12" r="10"/></svg>') no-repeat center;
+            bottom: 30px;
+            width: 60px;
+            height: 60px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="cyan" stroke-width="2"><path d="M12 2L4 20h16L12 2z"/></svg>') no-repeat center;
             background-size: contain;
-            transition: left 0.1s ease;
+            transition: left 0.08s ease;
             z-index: 10;
         }
         #player.shielded {
-            box-shadow: 0 0 20px #00ff00;
-            animation: shieldPulse 1s infinite;
+            filter: drop-shadow(0 0 15px #00ff00);
+            animation: shieldGlow 0.8s infinite;
         }
-        @keyframes shieldPulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+        @keyframes shieldGlow {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
         .star {
             position: absolute;
-            width: 30px;
-            height: 30px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="yellow"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>') no-repeat center;
+            width: 35px;
+            height: 35px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="yellow" stroke-width="2"><path d="M12 2L15 9l7 2-5 6 2 7-7-3-7 3 2-7-5-6 7-2z"/></svg>') no-repeat center;
             background-size: contain;
-            animation: moveDown linear, starSpin 1s infinite;
+            animation: moveDown linear, starRotate 0.8s infinite;
         }
-        @keyframes starSpin {
+        @keyframes starRotate {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
         .power-up {
             position: absolute;
-            width: 40px;
-            height: 40px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="green"><path d="M12 2L2 9l10 13 10-13z"/></svg>') no-repeat center;
+            width: 45px;
+            height: 45px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="lime"><circle cx="12" cy="12" r="10"/></svg>') no-repeat center;
             background-size: contain;
-            animation: moveDown linear, powerUpPulse 0.8s infinite;
+            animation: moveDown linear, powerGlow 0.6s infinite;
         }
-        @keyframes powerUpPulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
+        @keyframes powerGlow {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
         }
         .enemy {
             position: absolute;
-            width: 50px;
-            height: 50px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="red"><rect x="4" y="4" width="16" height="16" rx="4"/></svg>') no-repeat center;
+            width: 55px;
+            height: 55px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2"><path d="M4 4l16 16M4 20L20 4"/></svg>') no-repeat center;
             background-size: contain;
-            animation: moveDown linear, enemyWobble 0.5s infinite;
+            animation: moveDown linear, enemyPulse 0.4s infinite;
         }
-        @keyframes enemyWobble {
-            0%, 100% { transform: translateX(0); }
-            50% { transform: translateX(5px); }
+        @keyframes enemyPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
         .boss {
             position: absolute;
-            width: 100px;
-            height: 100px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="purple"><path d="M12 2L2 8v8l10 6 10-6V8z"/></svg>') no-repeat center;
+            width: 120px;
+            height: 120px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="purple" stroke-width="2"><path d="M12 2L2 12l10 10 10-10L12 2z"/></svg>') no-repeat center;
             background-size: contain;
-            animation: moveDown linear, bossShake 1s infinite;
+            animation: moveDown linear, bossVibrate 0.3s infinite;
         }
-        @keyframes bossShake {
+        @keyframes bossVibrate {
             0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
         }
         @keyframes moveDown {
-            0% { top: -100px; }
-            100% { top: 750px; }
+            0% { top: -150px; }
+            100% { top: 800px; }
         }
         #start-btn, #pause-btn {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            padding: 20px 40px;
-            font-size: 28px;
+            padding: 25px 50px;
+            font-size: 30px;
             color: #fff;
-            background: #ff00ff;
+            background: linear-gradient(45deg, #ff00ff, #00ffcc);
             border: none;
-            border-radius: 15px;
+            border-radius: 10px;
             cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.7);
             transition: all 0.3s ease;
             z-index: 20;
         }
         #pause-btn {
-            top: 20px;
+            top: 15px;
             left: auto;
-            right: 20px;
+            right: 15px;
             padding: 10px 20px;
-            font-size: 20px;
+            font-size: 18px;
             display: none;
         }
         #start-btn:hover, #pause-btn:hover {
-            background: #00ffff;
-            transform: translate(-50%, -55%);
-        }
-        #pause-btn:hover {
-            transform: translateY(-5px);
+            background: linear-gradient(45deg, #00ffcc, #ff00ff);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.9);
         }
         #game-over, #level-up {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 48px;
+            font-size: 60px;
             color: #ff0000;
-            text-shadow: 3px 3px 6px #fff;
+            text-shadow: 0 0 20px #ff0000;
             display: none;
-            animation: textShake 0.5s infinite;
+            animation: textFlicker 0.4s infinite;
             z-index: 20;
         }
         #level-up {
             color: #00ff00;
-            animation: levelUpFade 2s infinite;
+            text-shadow: 0 0 20px #00ff00;
+            animation: levelGlow 1.5s infinite;
         }
-        @keyframes textShake {
-            0%, 100% { transform: translate(-50%, -50%) translateX(0); }
-            25% { transform: translate(-50%, -50%) translateX(-5px); }
-            75% { transform: translate(-50%, -50%) translateX(5px); }
+        @keyframes textFlicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
         }
-        @keyframes levelUpFade {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
+        @keyframes levelGlow {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
         }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div class="cyber-bg"></div>
     <div id="game-container">
         <div id="score">Score: 0</div>
         <div id="level">Level: 1</div>
         <div id="high-score">High Score: 0</div>
-        <div id="title">Star Runner</div>
+        <div id="lives">Lives: 3</div>
+        <div id="title">Neon Starstrike</div>
         <div id="player"></div>
-        <button id="start-btn">Start Running!</button>
+        <button id="start-btn">Engage!</button>
         <button id="pause-btn">Pause</button>
-        <div id="game-over">Game Over!</div>
-        <div id="level-up">Level Up!</div>
+        <div id="game-over">System Failure!</div>
+        <div id="level-up">Core Upgrade!</div>
     </div>
 
     <script>
@@ -221,6 +221,7 @@
         const scoreDisplay = document.getElementById('score');
         const levelDisplay = document.getElementById('level');
         const highScoreDisplay = document.getElementById('high-score');
+        const livesDisplay = document.getElementById('lives');
         const startBtn = document.getElementById('start-btn');
         const pauseBtn = document.getElementById('pause-btn');
         const gameOverText = document.getElementById('game-over');
@@ -228,12 +229,13 @@
 
         let score = 0;
         let level = 1;
+        let lives = 3;
         let highScore = localStorage.getItem('highScore') || 0;
         highScoreDisplay.textContent = `High Score: ${highScore}`;
         let gameStarted = false;
         let gamePaused = false;
-        let playerPos = 375; // Center of 800px width - 50px player width / 2
-        const laneWidth = 150; // Five lanes: 75, 225, 375, 525, 675
+        let playerPos = 420; // Center of 900px width - 60px player width / 2
+        const laneWidth = 180; // Five lanes: 90, 270, 450, 630, 810
         let spawnInterval;
         let gameLoop;
         let shieldActive = false;
@@ -249,8 +251,10 @@
                 gameOverText.style.display = 'none';
                 levelUpText.style.display = 'none';
                 score = 0;
+                lives = 3;
                 level = 1;
                 scoreDisplay.textContent = `Score: ${score}`;
+                livesDisplay.textContent = `Lives: ${lives}`;
                 levelDisplay.textContent = `Level: ${level}`;
                 startGame();
             }
@@ -277,9 +281,9 @@
 
         document.addEventListener('keydown', (e) => {
             if (!gameStarted || gamePaused) return;
-            if (e.key === 'ArrowLeft' && playerPos > 75) {
+            if (e.key === 'ArrowLeft' && playerPos > 90) {
                 playerPos -= laneWidth;
-            } else if (e.key === 'ArrowRight' && playerPos < 675) {
+            } else if (e.key === 'ArrowRight' && playerPos < 810) {
                 playerPos += laneWidth;
             }
             player.style.left = `${playerPos}px`;
@@ -288,32 +292,32 @@
         function startGame() {
             if (spawnInterval) clearInterval(spawnInterval);
             if (gameLoop) clearInterval(gameLoop);
-            const spawnRate = Math.max(800 - (level * 100), 300); // Minimum 300ms
+            const spawnRate = Math.max(700 - (level * 80), 250); // Faster progression
             spawnInterval = setInterval(createObject, spawnRate);
-            gameLoop = setInterval(updateGame, 30); // 30ms for smooth updates
+            gameLoop = setInterval(updateGame, 25); // Smoother at 25ms
         }
 
         function createObject() {
             if (!gameStarted || gamePaused) return;
             const rand = Math.random();
-            const lane = Math.floor(Math.random() * 5) * laneWidth + 75;
+            const lane = Math.floor(Math.random() * 5) * laneWidth + 90;
             const obj = document.createElement('div');
             obj.style.left = `${lane}px`;
-            let speed = 3 + level * 0.5; // Base speed increases with level
+            let speed = 2.5 + level * 0.6; // Adjusted speed scaling
 
             if (rand < 0.5) { // 50% chance of star
                 obj.classList.add('star');
                 obj.style.animationDuration = `${speed}s`;
-            } else if (rand < 0.7) { // 20% chance of power-up
+            } else if (rand < 0.65) { // 15% chance of power-up
                 obj.classList.add('power-up');
-                obj.style.animationDuration = `${speed + 1}s`;
-            } else if (rand < 0.95) { // 25% chance of enemy
+                obj.style.animationDuration = `${speed + 1.5}s`;
+            } else if (rand < 0.95) { // 30% chance of enemy
                 obj.classList.add('enemy');
                 obj.style.animationDuration = `${speed}s`;
-            } else if (score >= 100 * level) { // Boss at 100 points per level
+            } else if (score >= 150 * level) { // Boss at 150 points per level
                 obj.classList.add('boss');
-                obj.style.animationDuration = `${speed + 2}s`;
-                obj.style.left = `${lane - 25}px`; // Center boss
+                obj.style.animationDuration = `${speed + 3}s`;
+                obj.style.left = `${lane - 30}px`; // Center boss
             } else {
                 return;
             }
@@ -321,7 +325,7 @@
             gameContainer.appendChild(obj);
             setTimeout(() => {
                 if (obj.parentElement) obj.remove();
-            }, (speed + 2) * 1000);
+            }, (speed + 3) * 1000);
         }
 
         function updateGame() {
@@ -344,7 +348,7 @@
 
         function handleCollision(obj) {
             if (obj.classList.contains('star')) {
-                score += 10 + level * 5;
+                score += 15 + level * 5;
                 scoreDisplay.textContent = `Score: ${score}`;
                 obj.remove();
             } else if (obj.classList.contains('power-up')) {
@@ -356,37 +360,43 @@
                     player.classList.remove('shielded');
                     obj.remove();
                 } else {
-                    endGame();
+                    lives--;
+                    livesDisplay.textContent = `Lives: ${lives}`;
+                    obj.remove();
+                    if (lives <= 0) endGame();
                 }
             }
         }
 
         function applyPowerUp() {
             const power = Math.random();
-            if (power < 0.5) {
+            if (power < 0.4) {
                 shieldActive = true;
                 player.classList.add('shielded');
                 setTimeout(() => {
                     shieldActive = false;
                     player.classList.remove('shielded');
-                }, 5000);
-            } else {
+                }, 6000);
+            } else if (power < 0.7) {
                 speedBoost = true;
-                player.style.transition = 'left 0.05s ease'; // Faster movement
+                player.style.transition = 'left 0.04s ease';
                 setTimeout(() => {
                     speedBoost = false;
-                    player.style.transition = 'left 0.1s ease';
-                }, 3000);
+                    player.style.transition = 'left 0.08s ease';
+                }, 4000);
+            } else {
+                lives = Math.min(lives + 1, 5); // Max 5 lives
+                livesDisplay.textContent = `Lives: ${lives}`;
             }
         }
 
         function checkLevelUp() {
-            const nextLevel = Math.floor(score / 50) + 1;
+            const nextLevel = Math.floor(score / 75) + 1;
             if (nextLevel > level) {
                 level = nextLevel;
                 levelDisplay.textContent = `Level: ${level}`;
                 levelUpText.style.display = 'block';
-                setTimeout(() => levelUpText.style.display = 'none', 2000);
+                setTimeout(() => levelUpText.style.display = 'none', 2500);
                 startGame(); // Adjust spawn rate
             }
         }
@@ -394,7 +404,7 @@
         function removeOffscreenObjects() {
             document.querySelectorAll('.star, .power-up, .enemy, .boss').forEach(obj => {
                 const top = parseInt(obj.style.top) || 0;
-                if (top > 700) obj.remove();
+                if (top > 750) obj.remove();
             });
         }
 
@@ -412,7 +422,7 @@
             clearInterval(gameLoop);
             gameOverText.style.display = 'block';
             startBtn.style.display = 'block';
-            startBtn.textContent = 'Play Again!';
+            startBtn.textContent = 'Reboot!';
             pauseBtn.style.display = 'none';
             document.querySelectorAll('.star, .power-up, .enemy, .boss').forEach(obj => obj.remove());
             if (score > highScore) {
