@@ -3,74 +3,424 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catch the Ball</title>
+    <title>Star Runner - Fixed Advanced Edition</title>
     <style>
         body {
-            text-align: center;
-            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #ff6f61, #6b48ff, #00ddeb);
+            background-size: 200% 200%;
+            animation: backgroundShift 15s ease infinite;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
         }
-        canvas {
-            border: 2px solid black;
-            display: block;
-            margin: 20px auto;
+        @keyframes backgroundShift {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+            100% { background-position: 0% 0%; }
         }
-        #score {
+        #game-container {
+            position: relative;
+            width: 800px;
+            height: 700px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.7);
+            overflow: hidden;
+            border: 5px solid #ffd700;
+            animation: borderPulse 3s infinite;
+        }
+        @keyframes borderPulse {
+            0% { border-color: #ffd700; }
+            33% { border-color: #ff00ff; }
+            66% { border-color: #00ffff; }
+            100% { border-color: #ffd700; }
+        }
+        #score, #level, #high-score {
+            position: absolute;
+            top: 20px;
             font-size: 24px;
+            color: #fff;
+            text-shadow: 2px 2px 5px #000;
+            animation: textBounce 2s infinite;
+        }
+        #score { left: 20px; }
+        #level { left: 50%; transform: translateX(-50%); }
+        #high-score { right: 20px; }
+        @keyframes textBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        #title {
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 48px;
+            color: #ffd700;
+            text-shadow: 4px 4px 8px #ff00ff, -4px -4px 8px #00ffff;
+            animation: titleGlow 2s infinite;
+        }
+        @keyframes titleGlow {
+            0% { text-shadow: 4px 4px 8px #ff00ff, -4px -4px 8px #00ffff; }
+            50% { text-shadow: 6px 6px 12px #ff00ff, -6px -6px 12px #00ffff; }
+            100% { text-shadow: 4px 4px 8px #ff00ff, -4px -4px 8px #00ffff; }
+        }
+        #player {
+            position: absolute;
+            bottom: 20px;
+            width: 50px;
+            height: 50px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="cyan"><circle cx="12" cy="12" r="10"/></svg>') no-repeat center;
+            background-size: contain;
+            transition: left 0.1s ease;
+            z-index: 10;
+        }
+        #player.shielded {
+            box-shadow: 0 0 20px #00ff00;
+            animation: shieldPulse 1s infinite;
+        }
+        @keyframes shieldPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .star {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="yellow"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>') no-repeat center;
+            background-size: contain;
+            animation: moveDown linear, starSpin 1s infinite;
+        }
+        @keyframes starSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .power-up {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="green"><path d="M12 2L2 9l10 13 10-13z"/></svg>') no-repeat center;
+            background-size: contain;
+            animation: moveDown linear, powerUpPulse 0.8s infinite;
+        }
+        @keyframes powerUpPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        .enemy {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="red"><rect x="4" y="4" width="16" height="16" rx="4"/></svg>') no-repeat center;
+            background-size: contain;
+            animation: moveDown linear, enemyWobble 0.5s infinite;
+        }
+        @keyframes enemyWobble {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(5px); }
+        }
+        .boss {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="purple"><path d="M12 2L2 8v8l10 6 10-6V8z"/></svg>') no-repeat center;
+            background-size: contain;
+            animation: moveDown linear, bossShake 1s infinite;
+        }
+        @keyframes bossShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        @keyframes moveDown {
+            0% { top: -100px; }
+            100% { top: 750px; }
+        }
+        #start-btn, #pause-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px 40px;
+            font-size: 28px;
+            color: #fff;
+            background: #ff00ff;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            z-index: 20;
+        }
+        #pause-btn {
+            top: 20px;
+            left: auto;
+            right: 20px;
+            padding: 10px 20px;
+            font-size: 20px;
+            display: none;
+        }
+        #start-btn:hover, #pause-btn:hover {
+            background: #00ffff;
+            transform: translate(-50%, -55%);
+        }
+        #pause-btn:hover {
+            transform: translateY(-5px);
+        }
+        #game-over, #level-up {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            color: #ff0000;
+            text-shadow: 3px 3px 6px #fff;
+            display: none;
+            animation: textShake 0.5s infinite;
+            z-index: 20;
+        }
+        #level-up {
+            color: #00ff00;
+            animation: levelUpFade 2s infinite;
+        }
+        @keyframes textShake {
+            0%, 100% { transform: translate(-50%, -50%) translateX(0); }
+            25% { transform: translate(-50%, -50%) translateX(-5px); }
+            75% { transform: translate(-50%, -50%) translateX(5px); }
+        }
+        @keyframes levelUpFade {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
         }
     </style>
 </head>
 <body>
-    <h1>Catch the Ball!</h1>
-    <p id="score">Score: 0</p>
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
-    
+    <div id="game-container">
+        <div id="score">Score: 0</div>
+        <div id="level">Level: 1</div>
+        <div id="high-score">High Score: 0</div>
+        <div id="title">Star Runner</div>
+        <div id="player"></div>
+        <button id="start-btn">Start Running!</button>
+        <button id="pause-btn">Pause</button>
+        <div id="game-over">Game Over!</div>
+        <div id="level-up">Level Up!</div>
+    </div>
+
     <script>
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
+        const gameContainer = document.getElementById('game-container');
+        const player = document.getElementById('player');
+        const scoreDisplay = document.getElementById('score');
+        const levelDisplay = document.getElementById('level');
+        const highScoreDisplay = document.getElementById('high-score');
+        const startBtn = document.getElementById('start-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const gameOverText = document.getElementById('game-over');
+        const levelUpText = document.getElementById('level-up');
+
         let score = 0;
-        let ball = { x: 50, y: 50, radius: 20, dx: 2, dy: 2 };
-        
-        function drawBall() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.beginPath();
-            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-            ctx.fillStyle = "red";
-            ctx.fill();
-            ctx.closePath();
-        }
-        
-        function updateBall() {
-            ball.x += ball.dx;
-            ball.y += ball.dy;
-            if (ball.x + ball.radius > canvas.width || ball.x - ball.radius < 0) {
-                ball.dx *= -1;
-            }
-            if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
-                ball.dy *= -1;
-            }
-        }
-        
-        function gameLoop() {
-            updateBall();
-            drawBall();
-            requestAnimationFrame(gameLoop);
-        }
-        
-        canvas.addEventListener("click", function(event) {
-            const rect = canvas.getBoundingClientRect();
-            const clickX = event.clientX - rect.left;
-            const clickY = event.clientY - rect.top;
-            const distance = Math.sqrt((clickX - ball.x) ** 2 + (clickY - ball.y) ** 2);
-            
-            if (distance < ball.radius) {
-                score++;
-                document.getElementById("score").textContent = "Score: " + score;
-                ball.x = Math.random() * (canvas.width - ball.radius * 2) + ball.radius;
-                ball.y = Math.random() * (canvas.height - ball.radius * 2) + ball.radius;
+        let level = 1;
+        let highScore = localStorage.getItem('highScore') || 0;
+        highScoreDisplay.textContent = `High Score: ${highScore}`;
+        let gameStarted = false;
+        let gamePaused = false;
+        let playerPos = 375; // Center of 800px width - 50px player width / 2
+        const laneWidth = 150; // Five lanes: 75, 225, 375, 525, 675
+        let spawnInterval;
+        let gameLoop;
+        let shieldActive = false;
+        let speedBoost = false;
+
+        player.style.left = `${playerPos}px`;
+
+        startBtn.addEventListener('click', () => {
+            if (!gameStarted) {
+                gameStarted = true;
+                startBtn.style.display = 'none';
+                pauseBtn.style.display = 'block';
+                gameOverText.style.display = 'none';
+                levelUpText.style.display = 'none';
+                score = 0;
+                level = 1;
+                scoreDisplay.textContent = `Score: ${score}`;
+                levelDisplay.textContent = `Level: ${level}`;
+                startGame();
             }
         });
-        
-        gameLoop();
+
+        pauseBtn.addEventListener('click', () => {
+            if (gameStarted) {
+                gamePaused = !gamePaused;
+                pauseBtn.textContent = gamePaused ? 'Resume' : 'Pause';
+                if (gamePaused) {
+                    clearInterval(spawnInterval);
+                    clearInterval(gameLoop);
+                    document.querySelectorAll('.star, .power-up, .enemy, .boss').forEach(obj => {
+                        obj.style.animationPlayState = 'paused';
+                    });
+                } else {
+                    startGame();
+                    document.querySelectorAll('.star, .power-up, .enemy, .boss').forEach(obj => {
+                        obj.style.animationPlayState = 'running';
+                    });
+                }
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (!gameStarted || gamePaused) return;
+            if (e.key === 'ArrowLeft' && playerPos > 75) {
+                playerPos -= laneWidth;
+            } else if (e.key === 'ArrowRight' && playerPos < 675) {
+                playerPos += laneWidth;
+            }
+            player.style.left = `${playerPos}px`;
+        });
+
+        function startGame() {
+            if (spawnInterval) clearInterval(spawnInterval);
+            if (gameLoop) clearInterval(gameLoop);
+            const spawnRate = Math.max(800 - (level * 100), 300); // Minimum 300ms
+            spawnInterval = setInterval(createObject, spawnRate);
+            gameLoop = setInterval(updateGame, 30); // 30ms for smooth updates
+        }
+
+        function createObject() {
+            if (!gameStarted || gamePaused) return;
+            const rand = Math.random();
+            const lane = Math.floor(Math.random() * 5) * laneWidth + 75;
+            const obj = document.createElement('div');
+            obj.style.left = `${lane}px`;
+            let speed = 3 + level * 0.5; // Base speed increases with level
+
+            if (rand < 0.5) { // 50% chance of star
+                obj.classList.add('star');
+                obj.style.animationDuration = `${speed}s`;
+            } else if (rand < 0.7) { // 20% chance of power-up
+                obj.classList.add('power-up');
+                obj.style.animationDuration = `${speed + 1}s`;
+            } else if (rand < 0.95) { // 25% chance of enemy
+                obj.classList.add('enemy');
+                obj.style.animationDuration = `${speed}s`;
+            } else if (score >= 100 * level) { // Boss at 100 points per level
+                obj.classList.add('boss');
+                obj.style.animationDuration = `${speed + 2}s`;
+                obj.style.left = `${lane - 25}px`; // Center boss
+            } else {
+                return;
+            }
+
+            gameContainer.appendChild(obj);
+            setTimeout(() => {
+                if (obj.parentElement) obj.remove();
+            }, (speed + 2) * 1000);
+        }
+
+        function updateGame() {
+            if (!gameStarted || gamePaused) return;
+            checkCollisions();
+            checkLevelUp();
+            removeOffscreenObjects();
+        }
+
+        function checkCollisions() {
+            const playerRect = player.getBoundingClientRect();
+            const objects = document.querySelectorAll('.star, .power-up, .enemy, .boss');
+            objects.forEach(obj => {
+                const objRect = obj.getBoundingClientRect();
+                if (isColliding(playerRect, objRect)) {
+                    handleCollision(obj);
+                }
+            });
+        }
+
+        function handleCollision(obj) {
+            if (obj.classList.contains('star')) {
+                score += 10 + level * 5;
+                scoreDisplay.textContent = `Score: ${score}`;
+                obj.remove();
+            } else if (obj.classList.contains('power-up')) {
+                applyPowerUp();
+                obj.remove();
+            } else if (obj.classList.contains('enemy') || obj.classList.contains('boss')) {
+                if (shieldActive) {
+                    shieldActive = false;
+                    player.classList.remove('shielded');
+                    obj.remove();
+                } else {
+                    endGame();
+                }
+            }
+        }
+
+        function applyPowerUp() {
+            const power = Math.random();
+            if (power < 0.5) {
+                shieldActive = true;
+                player.classList.add('shielded');
+                setTimeout(() => {
+                    shieldActive = false;
+                    player.classList.remove('shielded');
+                }, 5000);
+            } else {
+                speedBoost = true;
+                player.style.transition = 'left 0.05s ease'; // Faster movement
+                setTimeout(() => {
+                    speedBoost = false;
+                    player.style.transition = 'left 0.1s ease';
+                }, 3000);
+            }
+        }
+
+        function checkLevelUp() {
+            const nextLevel = Math.floor(score / 50) + 1;
+            if (nextLevel > level) {
+                level = nextLevel;
+                levelDisplay.textContent = `Level: ${level}`;
+                levelUpText.style.display = 'block';
+                setTimeout(() => levelUpText.style.display = 'none', 2000);
+                startGame(); // Adjust spawn rate
+            }
+        }
+
+        function removeOffscreenObjects() {
+            document.querySelectorAll('.star, .power-up, .enemy, .boss').forEach(obj => {
+                const top = parseInt(obj.style.top) || 0;
+                if (top > 700) obj.remove();
+            });
+        }
+
+        function isColliding(rect1, rect2) {
+            return !(rect1.right < rect2.left || 
+                     rect1.left > rect2.right || 
+                     rect1.bottom < rect2.top || 
+                     rect1.top > rect2.bottom);
+        }
+
+        function endGame() {
+            gameStarted = false;
+            gamePaused = false;
+            clearInterval(spawnInterval);
+            clearInterval(gameLoop);
+            gameOverText.style.display = 'block';
+            startBtn.style.display = 'block';
+            startBtn.textContent = 'Play Again!';
+            pauseBtn.style.display = 'none';
+            document.querySelectorAll('.star, .power-up, .enemy, .boss').forEach(obj => obj.remove());
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('highScore', highScore);
+                highScoreDisplay.textContent = `High Score: ${highScore}`;
+            }
+        }
     </script>
 </body>
 </html>
